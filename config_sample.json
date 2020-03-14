@@ -1,0 +1,15 @@
+{
+    "telegram" : {
+        "token" : "123456789:abcdefghijklmnopqrstuvxyz",
+        "admin_id" : "123456789"
+    },
+    "weather" : {
+      "token" : "123123123123123",
+      "location" : "longitude,latitude"
+    },
+    "server" : {
+    	"domain" : "https://{site_url}",
+        "root" : "/path/to/bot/",
+    	"index_page" : "index.php"
+    }
+}

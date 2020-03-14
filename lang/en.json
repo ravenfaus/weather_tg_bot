@@ -1,0 +1,22 @@
+{
+    "welcome_message": "You are welcome, {name}",
+    "morning_message": "💌Good morning, {name}",
+    "btn_weather": "☁️Weather",
+    "btn_language": "🇺🇸Language",
+    "weather_current": "Current",
+    "weather_today": "Today",
+    "weather_daily": "Daily",
+    "weather_choose": "Choose time, please.",
+    "weather_humidity": "Humidity",
+    "weather_wind_speed": "Wind speed {wind} m/s",
+    "weather_temp": "Temperature",
+    "weather_cur_temp": "Current temperature",
+    "weather_home_temp": "Home temperature:",
+    "weather_at": "Weather at {date}",
+    "weather_precip": "Precip probability",
+    "weather_sunrise_at": "Sunrise at {date}",
+    "weather_sunset_at": "Sunset at {date}",
+    "weather_min_temp": "Minimal temperature",
+    "weather_max_temp": "Maximal temperature",
+    "language_changed": "Language changed."
+}
