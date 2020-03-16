@@ -7,6 +7,9 @@
       "token" : "123123123123123",
       "location" : "longitude,latitude"
     },
+    "mapbox" : {
+      "token" : "123123123123123"
+    },
     "server" : {
     	"domain" : "https://{site_url}",
         "root" : "/path/to/bot/",

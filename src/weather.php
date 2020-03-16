@@ -15,11 +15,31 @@ class weather
 	private $weather;
 	private $lang;
 
-	public function __construct($app_id, $location, $lang='en')
+	public function __construct($app_id, $lang='en')
 	{
 		$this->app_id = $app_id;
-		$this->location = $location;
 		$this->lang = $lang;
+	}
+
+	public function set_location($location)
+	{
+		$this->location = $location;
+	}
+
+	public static function get_coord($city, $token)
+	{
+		$url = "https://api.mapbox.com/geocoding/v5/mapbox.places/".urlencode($city).".json?access_token=".$token;
+		$c = new curl();
+		curl_setopt($c,CURLOPT_ENCODING, "utf-8");
+		$r = $c->request($url, "GET");
+		$j = json_decode($r, true);
+		$result = [];
+		foreach ($j['features'] as $city) {
+			$longitude = $city['geometry']['coordinates'][0];
+			$latitude = $city['geometry']['coordinates'][1];
+			$result[$city['place_name']] = $longitude . ',' . $latitude;
+		}
+		return $result;
 	}
 
 	public function request()

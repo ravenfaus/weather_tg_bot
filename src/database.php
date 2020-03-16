@@ -21,7 +21,8 @@ class database
 															username TEXT,
 															lang TEXT,
 															last_msg TEXT,
-															last_msg_id INTEGER)");
+															last_msg_id INTEGER,
+															coord TEXT)");
 	}
 
 	public function add_user($user)
@@ -35,6 +36,20 @@ class database
 						"'".$user->username."', ".
 						"'".$user->lang."', ".
 						"'".$user->last_msg."')");
+	}
+
+	public function set_coord($id, $coord)
+	{
+		$this->db->query("UPDATE users SET coord = '" . $coord . "' WHERE id = " . $id);
+	}
+
+	public function user_coord($id)
+	{
+		$r = $this->db->query("SELECT coord FROM users WHERE id = " . $id);
+		if (empty($r))
+			return '';
+		else
+			return $r->fetchArray()['coord'];
 	}
 
 	public function set_lang($id, $lang)

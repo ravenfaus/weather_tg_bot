@@ -1,8 +1,9 @@
 {
-    "welcome_message": "You are welcome, {name}",
+    "welcome_message": "You are welcome, {name}. Please, enter your city for weather forecast",
     "morning_message": "💌Good morning, {name}",
     "btn_weather": "☁️Weather",
     "btn_language": "🇺🇸Language",
+    "btn_location": "🌎Location",
     "weather_current": "Current",
     "weather_today": "Today",
     "weather_daily": "Daily",
@@ -18,5 +19,8 @@
     "weather_sunset_at": "Sunset at {date}",
     "weather_min_temp": "Minimal temperature",
     "weather_max_temp": "Maximal temperature",
-    "language_changed": "Language changed."
+    "language_changed": "Language changed.",
+    "set_location": "Enter your city",
+    "choose_location": "Choose one of this cities",
+    "location_changed": "Your city was set"
 }

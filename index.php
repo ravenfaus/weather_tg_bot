@@ -17,7 +17,7 @@ $data = getRequest();
 $config = json_decode(file_get_contents(PATH."/config.json"));
 $api = new api($config->telegram->token);
 $db = new database('src/users.db');
-$weather = new Weather($config->weather->token, $config->weather->location);
+$weather = new Weather($config->weather->token);
 if (isset($data['callback_query'])) {
 	parse_callback($data['callback_query']);
 } elseif (isset($data['message'])) {
@@ -34,6 +34,7 @@ function parse_callback($callback)
 	$data = explode(' ', $query);
 	switch ($data[0]) {
 		case 'weather':
+      $weather->set_location($db->user_coord($user->id));
 			$weather->set_lang($lang->getLang());
 			switch ($data[1]) {
 				case 'current':
@@ -45,6 +46,10 @@ function parse_callback($callback)
 				case 'daily':
 					$text = $weather->get_daily();
 					break;
+        case 'coord':
+          $coord = $data[2];
+          $db->set_coord($user->id, $coord);
+          $text = $lang->getParam('location_changed');
 			}
 			$api->sendMessage($user->id, $text);
 			break;
@@ -64,6 +69,7 @@ function parse_message($msg)
   switch ($text) {
     case '/start':
       $api->sendMessage($user->id, $lang->getParam('welcome_message', ['name' => $user->first_name]), $keyboard->replyMarkup());
+      $db->set_last_msg($user->id, 'weather location');
       break;
     case $lang->getParam('btn_weather'):
       $ik = new InlineKeyboard();
@@ -81,6 +87,29 @@ function parse_message($msg)
         $keyboard = get_keyboard($lang);
         $api->sendMessage($user->id, $lang->getParam('language_changed'), $keyboard->replyMarkup());
         break;
+    case $lang->getParam('btn_location'):
+        $api->sendMessage($user->id, $lang->getParam('set_location'), $keyboard->replyMarkup());
+        $db->set_last_msg($user->id, 'weather location');
+        break;
+    default:
+      $last_msg = explode(' ', $db->get_last_msg($user->id));
+      switch ($last_msg[0]) {
+        case 'weather':
+          switch ($last_msg[1]) {
+            case 'location':
+              global $config;
+              $result = Weather::get_coord($text, $config->mapbox->token);
+              $ik = new InlineKeyboard();
+              foreach ($result as $city => $coord) {
+                $ik->addRow([new InlineButton($city, 'weather coord ' . $coord)]);
+              }
+              $api->sendMessage($user->id, $lang->getParam('choose_location'), $ik->replyMarkup());
+              $db->set_last_msg($user->id, '');
+              break;
+          }
+          break;
+      }
+      break;
   }
 }
 
@@ -89,6 +118,7 @@ function get_keyboard($lang)
 	$keyboard = new Keyboard();
 	$keyboard->addRow([$lang->getParam('btn_weather')]);
 	$keyboard->addRow([$lang->getParam('btn_language')]);
+  $keyboard->addRow([$lang->getParam('btn_location')]);
 	return $keyboard;
 }
 
