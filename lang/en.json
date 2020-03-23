@@ -23,4 +23,5 @@
     "set_location": "Enter your city",
     "choose_location": "Choose one of this cities",
     "location_changed": "Your city was set"
+    "help_message": "You can use me in inline mode, just type my name in chat and choose information what you need."
 }

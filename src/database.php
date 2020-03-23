@@ -38,6 +38,14 @@ class database
 						"'".$user->last_msg."')");
 	}
 
+	public function get_user_by($param, $query)
+	{
+		$r = $this->db->query("SELECT * FROM users WHERE " . $param . " = '" . $query ."'")->fetchArray();
+		$user = ['id'=> $r['id'], 'is_bot' => $r['is_bot'], 'first_name' => $r['first_name'], 'last_name' => $r['last_name'],
+			'username' => $r['username'], 'language_code' => $r['lang'], 'last_msg' => $r['last_msg']];
+		return new user($user);
+	}
+
 	public function set_coord($id, $coord)
 	{
 		$this->db->query("UPDATE users SET coord = '" . $coord . "' WHERE id = " . $id);

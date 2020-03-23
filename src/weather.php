@@ -158,5 +158,23 @@ class weather
 		}
 		return $text;
 	}
+
+	public function get_day($day)
+	{
+		$this->weather = $this->request();
+		$day = $this->weather['daily']['data'][$day];
+		$date = date('l', $day['time']);
+		$tempIcon = $this->get_emoji($day['icon']);
+		$tempMin = $tempIcon.$this->lang->getParam('weather_min_temp').': '.$day['temperatureMin'].'°C at '.date('H:i',$day['temperatureMinTime']);
+		$tempMax = $tempIcon.$this->lang->getParam('weather_max_temp').': '.$day['temperatureMax'].'°C at '.date('H:i',$day['temperatureMaxTime']);
+		$humidity = json_decode('"\uD83D\uDCA7"').$this->lang->getParam('weather_humidity').' '.($day['humidity']*100).'%';
+		$wind = json_decode('"\uD83C\uDF00"').$this->lang->getParam('weather_wind_speed',['wind' => $day['windSpeed']]);
+		$precips = $this->get_emoji('rain').$this->lang->getParam('weather_precip').': '.($day['precipProbability']*100).'%';
+		$sunrise = $this->get_emoji('clear-day').$this->lang->getParam('weather_sunrise_at', ['date' => date('H:i', $day['sunriseTime'])]);
+		$sunset = $this->get_emoji('clear-night').$this->lang->getParam('weather_sunset_at', ['date' => date('H:i', $day['sunsetTime'])]);
+		$summary = '📊'.$day['summary'];
+		$text = json_decode('"\uD83D\uDCAC"').$date.PHP_EOL.$tempMin.PHP_EOL.$tempMax.PHP_EOL.$humidity.PHP_EOL.$wind.PHP_EOL.$precips.PHP_EOL.$sunrise.PHP_EOL.$sunset.PHP_EOL.$summary.PHP_EOL.PHP_EOL;
+		return $text;
+	}
 }
 ?>

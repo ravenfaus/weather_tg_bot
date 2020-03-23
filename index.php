@@ -22,20 +22,79 @@ if (isset($data['callback_query'])) {
 	parse_callback($data['callback_query']);
 } elseif (isset($data['message'])) {
 	parse_message($data['message']);
+} elseif (isset($data['inline_query'])) {
+  parse_inline($data['inline_query']);
+} elseif (isset($data['chosen_inline_result']))
+  parse_choosen($data['chosen_inline_result']);
+
+function parse_choosen($res)
+{
+    global $db;
+    $user = new user($res['from']);
+    $db->set_last_msg_id($user->id, $res['inline_message_id']);
 }
 
+function parse_inline($iquery)
+{
+    global $api, $db, $weather;
+    $id = $iquery['id'];
+    $user = new User($iquery['from']);
+    $lang = new Lang($db->user_lang($user->id));
+    $weather->set_location($db->user_coord($user->id));
+    $weather->set_lang($lang->getLang());
+    $arr = [];
+    $art = new InlineQueryResultArticle(
+        0,
+        $lang->getParam('weather_current'),
+        ['message_text' => $weather->get_current()]
+      );
+    array_push($arr, $art->get());
+    $art = new InlineQueryResultArticle(
+        1,
+        $lang->getParam('weather_today'),
+        ['message_text' => $weather->get_today()]
+      );
+    array_push($arr, $art->get());
+
+    $ik = new InlineKeyboard();
+    $ik->addRow([new InlineButton('<', 'daily 0'), new InlineButton('>', 'daily 1')]);
+    $art = new InlineQueryResultArticle(
+        2,
+        $lang->getParam('weather_daily'),
+        ['message_text' => $weather->get_day(0)],
+        '',
+        $ik->replyMarkup()
+      );
+    array_push($arr, $art->get());
+
+    $r = $api->answerInlineQuery($id, $arr, 0);
+    $api->sendMessage($user->id, $r['description']);
+}
 function parse_callback($callback)
 {
 	global $api, $db, $weather;
 	$user = new User($callback['from']);
+  $id = $callback['inline_message_id'];
+  if (!$db->user_exists($user->id))
+    $user = $db->get_user_by('last_msg_id', $id);
 	$lang = new Lang($db->user_lang($user->id));
 	$cid = $callback['id'];
 	$query = $callback['data'];
 	$data = explode(' ', $query);
+  $weather->set_location($db->user_coord($user->id));
+  $weather->set_lang($lang->getLang());
 	switch ($data[0]) {
+    case 'daily':
+      $offset = $data[1];
+      $ik = new InlineKeyboard();
+      $prev_day = ($offset - 1) < 0 ? 0 : $offset - 1;
+      $next_day = ($offset + 1) > 7 ? 7 : $offset + 1;
+      $ik->addRow([new InlineButton('<', 'daily ' . $prev_day), new InlineButton('>', 'daily ' . $next_day)]);
+      $text = $weather->get_day($offset);
+      $r = $api->editInlineMessageText($id, $text, $ik->replyMarkup());
+      $api->sendMessage($user->id, $r['description']);
+      break;
 		case 'weather':
-      $weather->set_location($db->user_coord($user->id));
-			$weather->set_lang($lang->getLang());
 			switch ($data[1]) {
 				case 'current':
 					$text = $weather->get_current();
@@ -67,6 +126,9 @@ function parse_message($msg)
   $text = $msg['text'];
   $keyboard = get_keyboard($lang);
   switch ($text) {
+    case '/help':
+      $api->sendMessage($user->id, $lang->getParam('help_message'));
+      break;
     case '/start':
       $api->sendMessage($user->id, $lang->getParam('welcome_message', ['name' => $user->first_name]), $keyboard->replyMarkup());
       $db->set_last_msg($user->id, 'weather location');

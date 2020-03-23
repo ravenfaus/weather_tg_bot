@@ -34,12 +34,27 @@ class api
 		return $this->request('getFile', $params);
 	}
 
-	public function sendMessage($id, $text, $reply_markup=null)
+	public function sendDocument($id, $document, $thumb='', $caption='', $reply_markup=null)
+	{
+		$params = array
+		(
+			'chat_id' => $id,
+			'document' => $document,
+			'thumb' => $thumb,
+			'caption' => $caption,
+			'reply_markup' => ($reply_markup == null ? null : json_encode($reply_markup))
+		);
+		return $this->request('sendDocument', $params);
+	}
+
+	public function sendMessage($id, $text, $reply_markup=null, $reply_to=null, $parse_mode=null)
 	{
 		$params = array
 		(
 			'chat_id' => $id,
 			'text' => $text,
+			'reply_to_message_id' => $reply_to,
+			'parse_mode' => $parse_mode,
 			'reply_markup' => ($reply_markup == null ? null : json_encode($reply_markup))
 		);
 		return $this->request('sendMessage', $params);
@@ -57,6 +72,39 @@ class api
 		return $this->request('editMessageText', $params);
 	}
 
+	public function editInlineMessageText($inline_id, $text='', $reply_markup=null)
+	{
+		$params = array
+		(
+			'inline_message_id' => $inline_id,
+			'text' => $text,
+			'reply_markup' => ($reply_markup == null ? null : json_encode($reply_markup))
+		);
+		return $this->request('editMessageText', $params);
+	}
+
+	public function editMessageCaption($id, $mid, $caption='', $reply_markup=null)
+	{
+		$params = array
+		(
+			'caption' => $caption,
+			'chat_id' => $id,
+			'message_id' => $mid,
+			'reply_markup' => ($reply_markup == null ? null : json_encode($reply_markup))
+		);
+		return $this->request('editMessageCaption', $params);
+	}
+
+	public function deleteMessage($id, $mid)
+	{
+		$params = array
+		(
+			'chat_id' => $id,
+			'message_id' => $mid,
+		);
+		return $this->request('deleteMessage', $params);
+	}
+
 	public function answerCallbackQuery($id, $text=null, $show_alert=null)
 	{
 		$params = array
@@ -69,7 +117,7 @@ class api
 	}
 
 	//https://core.telegram.org/bots/api#sendphoto
-	public function sendPhoto($id, $caption='', $photo, $reply_markup=null, $disable_notification=false, $parse_mode='HTML')
+	public function sendPhoto($id, $photo, $caption='', $reply_markup=null, $disable_notification=false, $parse_mode='HTML')
 	{
 		$params = array
 		(
@@ -122,6 +170,23 @@ class api
     fclose($wh);
 
     return true;
-}
+		}
+
+		public function answerInlineQuery($id, $results, $cache=300,
+										$is_personal=false, $next_offset='',
+										$switch_pm_text='', $switch_pm_parameter='')
+		{
+			$params = array
+			(
+				'inline_query_id' => $id,
+				'results' => json_encode($results),
+				'cache_time' => $cache,
+				'is_personal' => $is_personal,
+				'next_offset' => $next_offset,
+				'switch_pm_text' => $switch_pm_text,
+				'switch_pm_parameter' => $switch_pm_parameter
+			);
+			return $this->request('answerInlineQuery', $params);
+		}
 }
 ?>
