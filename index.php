@@ -67,8 +67,7 @@ function parse_inline($iquery)
       );
     array_push($arr, $art->get());
 
-    $r = $api->answerInlineQuery($id, $arr, 0);
-    $api->sendMessage($user->id, $r['description']);
+    $api->answerInlineQuery($id, $arr, 0);
 }
 function parse_callback($callback)
 {
@@ -91,8 +90,7 @@ function parse_callback($callback)
       $next_day = ($offset + 1) > 7 ? 7 : $offset + 1;
       $ik->addRow([new InlineButton('<', 'daily ' . $prev_day), new InlineButton('>', 'daily ' . $next_day)]);
       $text = $weather->get_day($offset);
-      $r = $api->editInlineMessageText($id, $text, $ik->replyMarkup());
-      $api->sendMessage($user->id, $r['description']);
+      $api->editInlineMessageText($id, $text, $ik->replyMarkup());
       break;
 		case 'weather':
 			switch ($data[1]) {
